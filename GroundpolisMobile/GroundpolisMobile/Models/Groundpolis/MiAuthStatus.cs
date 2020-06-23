@@ -9,5 +9,8 @@ namespace GroundpolisMobile
 
 		[JsonProperty("token")]
 		public string Token { get; set; }
+
+		[JsonProperty("user")]
+		public User User { get; set; }
 	}
 }

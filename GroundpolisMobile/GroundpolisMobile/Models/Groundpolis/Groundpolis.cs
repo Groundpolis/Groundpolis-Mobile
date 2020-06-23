@@ -9,6 +9,36 @@ namespace GroundpolisMobile
 {
 	public static class Groundpolis
 	{
+		public static readonly string[] Permission =
+		{
+			"read:account",
+			"write:account",
+			"read:blocks",
+			"write:blocks",
+			"read:drive",
+			"write:drive",
+			"read:favorites",
+			"write:favorites",
+			"read:following",
+			"write:following",
+			"read:messaging",
+			"write:messaging",
+			"read:mutes",
+			"write:mutes",
+			"write:notes",
+			"read:notifications",
+			"write:notifications",
+			"read:reactions",
+			"write:reactions",
+			"write:votes",
+			"read:pages",
+			"write:pages",
+			"write:page-likes",
+			"read:page-likes",
+			"read:user-groups",
+			"write:user-groups",
+		};
+
 		public static string Token { get; private set; }
 		public static string Host { get; private set; }
 

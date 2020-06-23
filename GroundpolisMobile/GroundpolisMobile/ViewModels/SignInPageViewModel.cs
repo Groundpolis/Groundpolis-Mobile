@@ -9,6 +9,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using System.Web;
 using Xamarin.Essentials;
 
 namespace GroundpolisMobile.ViewModels
@@ -46,6 +47,7 @@ namespace GroundpolisMobile.ViewModels
 				if (status.Ok)
 				{
 					await Groundpolis.SignInAsync(status.Token, Url.Value);
+					User.Value = status.User;
 				}
 				else
 				{
@@ -54,7 +56,7 @@ namespace GroundpolisMobile.ViewModels
 			});
 		}
 
-		public override void OnNavigatedTo(INavigationParameters parameters)
+		public override async void OnNavigatedTo(INavigationParameters parameters)
 		{
 			IsBusy.Value = true;
 			var vm = parameters["instance"] as JoinMisskeyInstanceViewModel;
@@ -63,20 +65,26 @@ namespace GroundpolisMobile.ViewModels
 			if (!(vm.Meta.Value.Features?.miauth ?? false))
 			{
 				Error.Value = "このインスタンスは MiAuth をサポートしないため、Groundpolis Mobile では現在ご利用いただけません。";
+				IsLoaded.Value = true;
 				return;
 			}
 
-			MiAuthAsync();
+			await MiAuthAsync();
 
 			IsBusy.Value = false;
+			IsLoaded.Value = true;
 		}
 
 		private async Task MiAuthAsync()
 		{
-
 			uuid = Guid.NewGuid().ToString();
-			var url = $"https://{Url.Value}/miauth/{uuid}?name=Groundpolis+Mobile&icon={System.Web.HttpUtility.UrlEncode("https://groundpolis.app/assets/icon.svg")}&permission=read:account,write:account,read:blocks,write:blocks,read:drive,write:drive,read:favorites,write:favorites,read:following,write:following,read:messaging,write:messaging,read:mutes,write:mutes,write:notes,read:notifications,write:notifications,read:reactions,write:reactions,write:votes,read:pages,write:pages,write:page-likes,read:page-likes,read:user-groups,write:user-groups";
-			// MVVM の道義に反するけど、しらねー
+
+			var url = $"https://{Url.Value}/miauth/{uuid}?"
+				+ "name=Groundpolis+Mobile"
+				+ $"&callback={HttpUtility.UrlEncode(Const.MIAUTH_CALLBACK)}"
+				+ $"&permission={string.Join(",", Groundpolis.Permission)}";
+
+			// MVVM の流儀に反するけど、しらねー
 			await Browser.OpenAsync(url, BrowserLaunchMode.SystemPreferred);
 		}
 

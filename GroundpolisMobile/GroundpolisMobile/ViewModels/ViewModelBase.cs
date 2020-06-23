@@ -15,6 +15,8 @@ namespace GroundpolisMobile.ViewModels
 
 		public ReactiveProperty<bool> IsLoading { get; } = new ReactiveProperty<bool>(false);
 
+		public ReactiveProperty<bool> IsLoaded { get; } = new ReactiveProperty<bool>(false);
+
 		public ViewModelBase(INavigationService navigationService)
 		{
 			NavigationService = navigationService;
