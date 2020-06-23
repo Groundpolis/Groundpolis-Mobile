@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:prism="http://prismlibrary.com"
+             prism:ViewModelLocator.AutowireViewModel="True"
+			 Title="インスタンスをさがす"
+			 IsBusy="{Binding IsLoading.Value}"
+			 x:Name="Root"
+             x:Class="GroundpolisMobile.Views.ExploreInstancesPage">
+
+	<StackLayout>
+
+		<Label FontSize="Body" HorizontalTextAlignment="Center" Margin="0,32,0,0">
+			お好きなインスタンスを選びましょう。
+		</Label>
+		<Button Text="お探しのインスタンスがみつかりませんか？"/>
+		<ListView
+			HasUnevenRows="True"
+			CachingStrategy="RecycleElementAndDataTemplate"
+			IsPullToRefreshEnabled="True"
+			IsRefreshing="{Binding IsLoading.Value}"
+			RefreshCommand="{Binding Reload}"
+			ItemsSource="{Binding Instances}">
+
+			<ListView.ItemTemplate>
+				<DataTemplate>
+					<ViewCell>
+						<StackLayout HorizontalOptions="FillAndExpand" Padding="16">
+							<StackLayout.GestureRecognizers>
+								<TapGestureRecognizer Command="{Binding BindingContext.Chosen, Source={x:Reference Root}}" CommandParameter="{Binding}"/>
+							</StackLayout.GestureRecognizers>
+							<Label FontSize="Title" Text="{Binding Name.Value}"/>
+							<Label TextColor="Gray" FontSize="Small" Margin="8,0,0,0" Text="{Binding Meta.Value.MaintainerName, TargetNullValue='', StringFormat=' by {0}'}"/>
+							<Label TextType="Html" Margin="8,8,0,0" Text="{Binding Description.Value,StringFormat='&lt;div style=&quot;font-size: 14px; font-family: sans-serif&quot;&gt;{0}&lt;/div&gt;'}"/>
+						</StackLayout>
+					</ViewCell>
+				</DataTemplate>
+			</ListView.ItemTemplate>
+
+		</ListView>
+	</StackLayout>
+
+</ContentPage>

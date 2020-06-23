@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:prism="http://prismlibrary.com"
+             prism:ViewModelLocator.AutowireViewModel="True"
+			 xmlns:ios="clr-namespace:Xamarin.Forms.PlatformConfiguration.iOSSpecific;assembly=Xamarin.Forms.Core"
+			 Title="サインイン"
+             x:Class="GroundpolisMobile.Views.SignInPage">
+
+	<StackLayout HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" Margin="16">
+		<Label FontSize="Title" Text="{Binding Name.Value}"/>
+		<Label IsVisible="{Binding SignInVisible.Value}" Text="戻ってきたら、確認ボタンを押してください。"/>
+		<Button IsVisible="{Binding SignInVisible.Value}" Command="{Binding SignIn}" Text="確認"/>
+		<Label IsVisible="{Binding ErrorVisible.Value}" TextColor="Red" Text="{Binding Error.Value}"/>
+		<StackLayout IsVisible="{Binding UserVisible}">
+			<Label Text="{Binding User.Value.Id, StringFormat=ID:{0}}"/>
+			<Label Text="{Binding User.Value.Username, StringFormat=@{0}}"/>
+			<Label Text="{Binding User.Value.Name}"/>
+			<Label Text="{Binding User.Value.NotesCount, StringFormat='{0} Notes'}"/>
+		</StackLayout>
+	</StackLayout>
+
+</ContentPage>
