@@ -34,26 +34,6 @@ namespace GroundpolisMobile.ViewModels
 			SignInVisible = User.CombineLatest(Error, (v, e) => v == null && e == null).ToReadOnlyReactiveProperty();
 			UserVisible = User.Select(v => v != null).ToReadOnlyReactiveProperty();
 			ErrorVisible = Error.Select(v => v != null).ToReadOnlyReactiveProperty();
-
-			SignIn = new ReactiveCommand(IsBusy.Select(i => !i));
-			SignIn.Subscribe(async () =>
-			{
-				IsBusy.Value = true;
-				var miauthUrl = $"https://{Url.Value}/api/miauth/{uuid}/check";
-				var res = await Http.PostAsync(miauthUrl, new StringContent(""));
-				var json = await res.Content.ReadAsStringAsync();
-
-				var status = JsonConvert.DeserializeObject<MiAuthStatus>(json);
-				if (status.Ok)
-				{
-					await Groundpolis.SignInAsync(status.Token, Url.Value);
-					User.Value = status.User;
-				}
-				else
-				{
-					Error.Value = "認証に失敗しました";
-				}
-			});
 		}
 
 		public override async void OnNavigatedTo(INavigationParameters parameters)
@@ -72,7 +52,6 @@ namespace GroundpolisMobile.ViewModels
 			await MiAuthAsync();
 
 			IsBusy.Value = false;
-			IsLoaded.Value = true;
 		}
 
 		private async Task MiAuthAsync()
@@ -85,7 +64,35 @@ namespace GroundpolisMobile.ViewModels
 				+ $"&permission={string.Join(",", Groundpolis.Permission)}";
 
 			// MVVM の流儀に反するけど、しらねー
-			await Browser.OpenAsync(url, BrowserLaunchMode.SystemPreferred);
+			try
+			{
+				await WebAuthenticator.AuthenticateAsync(new Uri(url), new Uri(Const.MIAUTH_CALLBACK));
+			}
+			catch (Exception)
+			{
+				Error.Value = "は？エラーやぞ";
+				IsLoaded.Value = true;
+				IsBusy.Value = false;
+				return;
+			}
+
+			IsLoaded.Value = true;
+
+			IsBusy.Value = true;
+			var miauthUrl = $"https://{Url.Value}/api/miauth/{uuid}/check";
+			var res = await Http.PostAsync(miauthUrl, new StringContent(""));
+			var json = await res.Content.ReadAsStringAsync();
+
+			var status = JsonConvert.DeserializeObject<MiAuthStatus>(json);
+			if (status.Ok)
+			{
+				await Groundpolis.SignInAsync(status.Token, Url.Value);
+				User.Value = status.User;
+			}
+			else
+			{
+				Error.Value = "認証に失敗しました";
+			}
 		}
 
 		private string uuid;

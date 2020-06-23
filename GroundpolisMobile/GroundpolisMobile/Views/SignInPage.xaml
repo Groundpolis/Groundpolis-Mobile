@@ -9,8 +9,6 @@
 
 	<StackLayout HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" Margin="16" IsVisible="{Binding IsLoaded.Value}">
 		<Label FontSize="Title" Text="{Binding Name.Value}"/>
-		<Label IsVisible="{Binding SignInVisible.Value}" Text="戻ってきたら、確認ボタンを押してください。"/>
-		<Button IsVisible="{Binding SignInVisible.Value}" Command="{Binding SignIn}" Text="確認"/>
 		<Label IsVisible="{Binding ErrorVisible.Value}" TextColor="Red" Text="{Binding Error.Value}"/>
 		<StackLayout IsVisible="{Binding UserVisible}">
 			<Label Text="{Binding User.Value.Id, StringFormat='ID:{0}'}"/>
