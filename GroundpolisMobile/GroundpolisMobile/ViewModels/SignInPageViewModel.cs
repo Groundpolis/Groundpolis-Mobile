@@ -1,7 +1,4 @@
 ﻿using Newtonsoft.Json;
-using Prism.Commands;
-using Prism.Mvvm;
-using Prism.Navigation;
 using Reactive.Bindings;
 using System;
 using System.Collections.Generic;
@@ -29,27 +26,20 @@ namespace GroundpolisMobile.ViewModels
 
 		public ReactiveCommand SignIn { get; }
 
-		public SignInPageViewModel(INavigationService navigationService) : base(navigationService)
+		public SignInPageViewModel(JoinMisskeyInstanceViewModel vm)
 		{
 			SignInVisible = User.CombineLatest(Error, (v, e) => v == null && e == null).ToReadOnlyReactiveProperty();
 			UserVisible = User.Select(v => v != null).ToReadOnlyReactiveProperty();
 			ErrorVisible = Error.Select(v => v != null).ToReadOnlyReactiveProperty();
+
+			PerformSignIn(vm);
 		}
 
-		public override async void OnNavigatedTo(INavigationParameters parameters)
+		private async void PerformSignIn(JoinMisskeyInstanceViewModel vm)
 		{
 			IsBusy.Value = true;
-			var vm = parameters["instance"] as JoinMisskeyInstanceViewModel;
 			Url.Value = vm.Url.Value;
 			Name.Value = vm.Name.Value;
-			if (!(vm.Meta.Value.Features?.miauth ?? false))
-			{
-				Error.Value = "このインスタンスは MiAuth をサポートしないため、Groundpolis Mobile では現在ご利用いただけません。";
-				IsLoaded.Value = true;
-				return;
-			}
-
-			await MiAuthAsync();
 
 			IsBusy.Value = false;
 		}
@@ -87,7 +77,8 @@ namespace GroundpolisMobile.ViewModels
 			if (status.Ok)
 			{
 				await Groundpolis.SignInAsync(status.Token, Url.Value);
-				User.Value = status.User;
+				while (Root.Navigation.ModalStack.Count > 0)
+					await Root.Navigation.PopModalAsync();
 			}
 			else
 			{

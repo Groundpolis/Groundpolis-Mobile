@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:GroundpolisMobile"
+             x:Class="GroundpolisMobile.Views.TitlePage"
+			 NavigationPage.HasNavigationBar="False"
+			Title="Groundpolis"
+			 NavigationPage.HasBackButton="False">
+
+	<Grid Margin="16">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="1*"/>
+			<RowDefinition Height="1*"/>
+			<RowDefinition Height="16"/>
+		</Grid.RowDefinitions>
+		<Image Grid.Row="0" Source="{local:ImageResource GroundpolisMobile.Resources.gpmobile.png}" Aspect="AspectFit" Margin="0,0,0,0" />
+		<StackLayout Grid.Row="1">
+			<Button Text="インスタンスをさがす" Command="{Binding ExploreInstances}"/>
+		</StackLayout>
+		<Label Grid.Row="2" HorizontalTextAlignment="End" Text="(C)2020 Groundpolis HQ" />
+	</Grid>
+</ContentPage>

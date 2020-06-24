@@ -1,11 +1,12 @@
-﻿using Newtonsoft.Json;
-using Prism.Mvvm;
-using Prism.Navigation;
+﻿using GroundpolisMobile.Views;
+using Newtonsoft.Json;
 using Reactive.Bindings;
 using System;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Web;
+using Xamarin.Essentials;
 
 namespace GroundpolisMobile.ViewModels
 {
@@ -15,23 +16,20 @@ namespace GroundpolisMobile.ViewModels
 			= new ReactiveCollection<JoinMisskeyInstanceViewModel>();
 
 		public ReactiveCommand<JoinMisskeyInstanceViewModel> Chosen { get; } = new ReactiveCommand<JoinMisskeyInstanceViewModel>();
+		public ReactiveCommand Close { get; } = new ReactiveCommand();
 		public ReactiveCommand Reload { get; } = new ReactiveCommand();
 
-		public ExploreInstancesPageViewModel(INavigationService navigationService)
-			: base(navigationService)
+		public ExploreInstancesPageViewModel()
 		{
 			Chosen.Subscribe((vm) =>
 			{
-				NavigationService.NavigateAsync("SignInPage", ("instance", vm));
+				SignInAsync(vm);
 			});
 
-			Reload.Subscribe(() => FetchInstances());
-		}
+			Close.Subscribe(() => Root.Navigation.PopModalAsync());
 
-		public override async void OnNavigatedTo(INavigationParameters parameters)
-		{
-			if (Instances.Count > 0) return;
-			await FetchInstances();
+			Reload.Subscribe(() => FetchInstances());
+			FetchInstances();
 		}
 
 		private async Task FetchInstances()
@@ -45,27 +43,60 @@ namespace GroundpolisMobile.ViewModels
 					.Where(i => i.Meta != null)
 					.Where(i => !i.Meta.DisableRegistration)
 					.OrderByDescending(i => i.Value)
+					.OrderByDescending(i => i.Meta.IsGroundpolis ? 1 : 0)
 					.Select(i => new JoinMisskeyInstanceViewModel(i))
 			);
+
 			IsLoading.Value = false;
 		}
-	}
 
-	public class JoinMisskeyInstanceViewModel : BindableBase
-	{
-		public ReactiveProperty<string> Url { get; } = new ReactiveProperty<string>("");
-		public ReactiveProperty<string> Name { get; } = new ReactiveProperty<string>("");
-		public ReactiveProperty<string> Description { get; } = new ReactiveProperty<string>("");
-		public ReactiveProperty<Meta> Meta { get; } = new ReactiveProperty<Meta>(new Meta());
-
-		public JoinMisskeyInstanceViewModel(JoinMisskeyInstance instance)
+		private async Task SignInAsync(JoinMisskeyInstanceViewModel vm)
 		{
-			if (instance == null) throw new ArgumentNullException(nameof(instance));
-			Url.Value = instance.Url;
-			Name.Value = string.IsNullOrEmpty(instance.Meta.Name) ? instance.Url : instance.Meta.Name;
-			var desc = string.IsNullOrEmpty(instance.Meta.Description) ? "説明はありません。" : instance.Meta.Description;
-			Description.Value = desc;
-			Meta.Value = instance.Meta;
+			if (!vm.Meta.Value.Features.miauth)
+			{
+				await Root.DisplayAlert("ログインできません", "Groundpolis Mobile は MiAuth 認証のみを現在サポートしていますが、このインスタンスは旧式の認証方式のみをサポートしているため、ご利用いただけません。他のインスタンスをご利用ください", "OK");
+				return;
+			}
+
+			await MiAuthAsync(vm);
+		}
+
+
+
+		private async Task MiAuthAsync(JoinMisskeyInstanceViewModel vm)
+		{
+			var uuid = Guid.NewGuid().ToString();
+
+			var url = $"https://{vm.Url.Value}/miauth/{uuid}?"
+				+ "name=Groundpolis+Mobile"
+				+ $"&callback={HttpUtility.UrlEncode(Const.MIAUTH_CALLBACK)}"
+				+ $"&permission={string.Join(",", Groundpolis.Permission)}";
+
+			// MVVM の流儀に反するけど、しらねー
+			try
+			{
+				await WebAuthenticator.AuthenticateAsync(new Uri(url), new Uri(Const.MIAUTH_CALLBACK));
+			}
+			catch (Exception)
+			{
+				return;
+			}
+
+			var miauthUrl = $"https://{vm.Url.Value}/api/miauth/{uuid}/check";
+			var res = await Http.PostAsync(miauthUrl, new StringContent(""));
+			var json = await res.Content.ReadAsStringAsync();
+
+			var status = JsonConvert.DeserializeObject<MiAuthStatus>(json);
+			if (status.Ok)
+			{
+				await Groundpolis.SignInAsync(status.Token, vm.Url.Value);
+				while (Root.Navigation.ModalStack.Count > 0)
+					await Root.Navigation.PopModalAsync();
+			}
+			else
+			{
+				await Root.DisplayAlert("認証に失敗しました", "もう一度やり直してください。", "OK");
+			}
 		}
 	}
 }

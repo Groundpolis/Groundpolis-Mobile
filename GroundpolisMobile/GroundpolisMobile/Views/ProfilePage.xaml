@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+			 NavigationPage.HasBackButton="True"
+			 NavigationPage.HasNavigationBar="True"
+			 Title="{Binding Path=User.Value.Username, StringFormat='{0}のページ'}"
+             x:Class="GroundpolisMobile.Views.ProfilePage">
+	<StackLayout>
+		<Label Text="{Binding User.Value.Name}"/>
+		<Label Text="{Binding User.Value.Username}"/>
+		<Label Text="{Binding User.Value.Description}"/>
+	</StackLayout>
+  
+</ContentPage>

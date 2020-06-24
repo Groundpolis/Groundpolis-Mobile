@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Shell xmlns="http://xamarin.com/schemas/2014/forms"
+	xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+	xmlns:views="clr-namespace:GroundpolisMobile.Views;assembly=GroundpolisMobile"
+	Shell.NavBarHasShadow="True"
+	Shell.PresentationMode="NotAnimated"
+	x:Class="GroundpolisMobile.AppShell">
+
+	<Shell.FlyoutHeaderTemplate>
+		<DataTemplate>
+			<Grid HeightRequest="192">
+				<Image Source="{Binding User.Value.BannerUrl}" Aspect="AspectFill" Opacity="0.5"/>
+				<RelativeLayout Grid.Row="0">
+					<Frame x:Name="icon"
+						WidthRequest="64" HeightRequest="64"
+						Padding="0" CornerRadius="32" HasShadow="False"
+						RelativeLayout.XConstraint="{ConstraintExpression Constant=16, Type=Constant}"
+						RelativeLayout.YConstraint="{ConstraintExpression Constant=16, Type=Constant}">
+						<Image Source="{Binding User.Value.AvatarUrl}"/>
+					</Frame>
+					<Label x:Name="name"
+						Text="{Binding User.Value.Name, TargetNullValue=User.Value.Username}"
+						FontSize="20"
+						RelativeLayout.XConstraint="{ConstraintExpression Constant=16, Type=Constant}"
+						RelativeLayout.YConstraint="{ConstraintExpression Constant=72, Type=RelativeToView, ElementName=icon, Property=Y}"/>
+					<Label x:Name="acct"
+						Text="{Binding User.Value.Username, StringFormat='@{0}'}"
+						FontSize="16"
+						TextColor="#333333"
+						RelativeLayout.XConstraint="{ConstraintExpression Constant=16, Type=Constant}"
+						RelativeLayout.YConstraint="{ConstraintExpression Constant=24, Type=RelativeToView, ElementName=name, Property=Y}"/>
+				</RelativeLayout>
+			</Grid>
+		</DataTemplate>
+	</Shell.FlyoutHeaderTemplate>
+
+	<FlyoutItem Title="ホーム">
+		<views:MainPage Title="Timeline"/>
+		<views:MainPage Title="Explore"/>
+		<views:MainPage Title="Notifications"/>
+		<views:MainPage Title="Chat"/>
+	</FlyoutItem>
+
+	<FlyoutItem Title="プロフィール" Route="profile"/>
+	<FlyoutItem Title="設定" Route="setting"/>
+</Shell>

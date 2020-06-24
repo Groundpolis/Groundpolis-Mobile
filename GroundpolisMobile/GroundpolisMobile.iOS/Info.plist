@@ -10,8 +10,6 @@
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>UISupportedInterfaceOrientations~ipad</key>
 	<array>
@@ -23,9 +21,7 @@
 	<key>MinimumOSVersion</key>
 	<string>8.0</string>
 	<key>CFBundleDisplayName</key>
-	<string>GroundpolisMobile</string>
-	<key>CFBundleIdentifier</key>
-	<string>com.companyname.appname</string>
+	<string>Groundpolis</string>
 	<key>CFBundleVersion</key>
 	<string>1.0</string>
 	<key>CFBundleIconFiles</key>
@@ -59,5 +55,7 @@
 			<string>work.xeltica.groundpolis</string>
 		</dict>
 	</array>
+	<key>CFBundleIdentifier</key>
+	<string>work.xeltica.groundpolis</string>
 </dict>
 </plist>

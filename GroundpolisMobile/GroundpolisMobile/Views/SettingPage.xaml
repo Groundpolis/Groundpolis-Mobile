@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+			 Shell.PresentationMode="Modal"
+             x:Class="GroundpolisMobile.Views.SettingPage">
+	<TableView>
+		<TableRoot>
+			<TableSection Title="アカウント">
+				<TextCell Text="アカウントを追加する" Command="{Binding AddAccount}"/>
+				<TextCell Text="サインアウト" Command="{Binding SignOut}"/>
+			</TableSection>
+		</TableRoot>
+	</TableView>
+  
+</ContentPage>

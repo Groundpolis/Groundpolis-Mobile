@@ -19,6 +19,12 @@ namespace GroundpolisMobile
 
 		[JsonProperty("username")]
 		public string Username { get; set; }
+
+		[JsonProperty("avatarUrl")]
+		public string AvatarUrl { get; set; }
+
+		[JsonProperty("bannerUrl")]
+		public string BannerUrl { get; set; }
 	}
 
 }

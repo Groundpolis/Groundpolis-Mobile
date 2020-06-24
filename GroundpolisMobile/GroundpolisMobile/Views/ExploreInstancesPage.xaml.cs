@@ -1,4 +1,5 @@
-﻿using Xamarin.Forms;
+﻿using GroundpolisMobile.ViewModels;
+using Xamarin.Forms;
 
 namespace GroundpolisMobile.Views
 {
@@ -7,6 +8,7 @@ namespace GroundpolisMobile.Views
 		public ExploreInstancesPage()
 		{
 			InitializeComponent();
+			BindingContext = new ExploreInstancesPageViewModel();
 		}
 	}
 }

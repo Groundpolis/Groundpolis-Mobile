@@ -1,4 +1,5 @@
-﻿using Xamarin.Forms;
+﻿using GroundpolisMobile.ViewModels;
+using Xamarin.Forms;
 
 namespace GroundpolisMobile.Views
 {

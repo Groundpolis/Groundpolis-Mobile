@@ -1,41 +1,43 @@
-using Prism;
-using Prism.Ioc;
 using GroundpolisMobile.ViewModels;
 using GroundpolisMobile.Views;
 using Xamarin.Essentials.Interfaces;
 using Xamarin.Essentials.Implementation;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
+using System.Threading.Tasks;
+using System;
 
 [assembly: XamlCompilation(XamlCompilationOptions.Compile)]
 namespace GroundpolisMobile
 {
 	public partial class App
 	{
-		/* 
-         * The Xamarin Forms XAML Previewer in Visual Studio uses System.Activator.CreateInstance.
-         * This imposes a limitation in which the App class must have a default constructor. 
-         * App(IPlatformInitializer initializer = null) cannot be handled by the Activator.
-         */
-		public App() : this(null) { }
-
-		public App(IPlatformInitializer initializer) : base(initializer) { }
-
-		protected override async void OnInitialized()
+		public App()
 		{
 			InitializeComponent();
-
-			await NavigationService.NavigateAsync("NavigationPage/MainPage");
+			Bootstrap();
 		}
 
-		protected override void RegisterTypes(IContainerRegistry containerRegistry)
+		private async void Bootstrap()
 		{
-			containerRegistry.RegisterSingleton<IAppInfo, AppInfoImplementation>();
+			// とりあえず空 View を振っておく
+			MainPage = new ContentPage();
 
-			containerRegistry.RegisterForNavigation<NavigationPage>();
-			containerRegistry.RegisterForNavigation<MainPage, MainPageViewModel>();
-			containerRegistry.RegisterForNavigation<ExploreInstancesPage, ExploreInstancesPageViewModel>();
-			containerRegistry.RegisterForNavigation<SignInPage, SignInPageViewModel>();
+			await Groundpolis.InitializeAsync();
+
+			// Groundpolis クライアントの初期化が済んだのでシェルを表示
+			MainPage = new AppShell();
+
+			Groundpolis.CurrentSessionState.Subscribe(SummonModalIfNeeded);
+		}
+
+		private void SummonModalIfNeeded(Session s)
+		{
+			if (s == null)
+			{
+				// セッションが無なのでモーダルを出してサインインを促す
+				Shell.Current.Navigation.PushModalAsync(new TitlePage());
+			}
 		}
 	}
 }
